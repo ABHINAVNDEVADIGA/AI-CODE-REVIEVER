@@ -1,0 +1,14 @@
+{
+  "name": "ai-code-reviewer",
+  "version": "1.0.0",
+  "description": "AI-based code review tool",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Abhinav Devadiga",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.1"
+  }
+}

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Code Reviewer by Abhinav</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Global Styles */
+body {
+  font-family: 'Inter', Arial, sans-serif;
+  background: linear-gradient(135deg, #89f7fe, #66a6ff);
+  margin: 0;
+  padding: 0;
+  color: #1f2937;
+  text-transform: uppercase;
+}
+
+.container {
+  max-width: 900px;
+  margin: 60px auto;
+  background: linear-gradient(145deg, #ffffff, #e0f7fa);
+  padding: 50px;
+  border-radius: 25px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 35px 80px rgba(0,0,0,0.35);
+}
+
+h1 {
+  text-align: center;
+  color: #0d3b66;
+  font-weight: 700;
+  font-size: 38px;
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.2);
+}
+
+h2 {
+  text-align: center;
+  color: #3f72af;
+  font-weight: 600;
+  font-size: 22px;
+  margin-bottom: 40px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.15);
+}
+
+label {
+  display: block;
+  font-weight: 700;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+
+select, textarea, button {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 12px;
+  outline: none;
+  font-family: 'Inter', monospace;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+/* Dropdown styles */
+select {
+  font-weight: 700;
+  background: #f0f9ff;
+  color: #1f2937;
+  border: 2px solid #3b82f6;
+  cursor: pointer;
+}
+select:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px rgba(245,158,11,0.4);
+}
+
+/* Textarea */
+textarea {
+  height: 260px;
+  font-family: 'Fira Code', monospace;
+  font-size: 14px;
+  background: #fef9f9;
+  resize: vertical;
+  color: #1f2937;
+  border: 2px solid #3b82f6;
+}
+textarea:hover {
+  border-color: #f59e0b;
+  box-shadow: 0 0 15px rgba(245,158,11,0.4);
+}
+
+/* Button with gradient animation */
+@keyframes gradientMove {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+button {
+  margin-top: 25px;
+  background: linear-gradient(45deg, #ff6ec7, #845ec2, #ff6ec7, #8338ec);
+  background-size: 400% 400%;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 5px 25px rgba(255,110,199,0.5);
+  border-radius: 12px;
+  transition: all 0.4s ease;
+  animation: gradientMove 5s ease infinite;
+}
+
+button:hover {
+  box-shadow: 0 10px 35px rgba(255,60,172,0.7);
+  transform: translateY(-3px);
+}
+
+/* Code output */
+pre {
+  margin-top: 30px;
+  background: #1e1e2f;
+  color: #f1f1f1;
+  padding: 20px;
+  border-radius: 18px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+}
+
+/* Responsive */
+@media(max-width: 600px){
+  .container { padding: 25px; margin: 20px; }
+  h1 { font-size: 30px; }
+  h2 { font-size: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Code Reviewer by Abhinav</h1>
+  <h2>Professional Multi-Language Code Analysis</h2>
+
+  <label for="language">Select Language:</label>
+  <select id="language" onchange="setPlaceholder()">
+    <option value="">-- Select Language --</option>
+    <option value="javascript">JavaScript</option>
+    <option value="python">Python</option>
+    <option value="c">C</option>
+    <option value="cpp">C++</option>
+    <option value="java">Java</option>
+    <option value="html">HTML</option>
+    <option value="css">CSS</option>
+  </select>
+
+  <label for="code">Paste Your Code Here:</label>
+  <textarea id="code" placeholder="Select a language above to see placeholder..."></textarea>
+
+  <button onclick="reviewCode()">Review Code</button>
+
+  <pre id="output">Your review will appear here...</pre>
+</div>
+
+<script>
+  const placeholders = {
+    javascript: "// Paste JavaScript code here\nfunction hello() {\n  console.log('Hello');\n}",
+    python: "# Paste Python code here\ndef hello():\n    print('Hello')",
+    c: "/* Paste C code here */\n#include <stdio.h>\nint main() {\n  printf(\"Hello\");\n  return 0;\n}",
+    cpp: "// Paste C++ code here\n#include <iostream>\nusing namespace std;\nint main() {\n  cout << \"Hello\";\n  return 0;\n}",
+    java: "// Paste Java code here\npublic class Hello {\n  public static void main(String[] args) {\n    System.out.println(\"Hello\");\n  }\n}",
+    html: "<!-- Paste HTML code here -->\n<!DOCTYPE html>\n<html>\n<head><title>Hello</title></head>\n<body>\nHello World\n</body>\n</html>",
+    css: "/* Paste CSS code here */\nbody {\n  background-color: #f4f4f4;\n  color: #111;\n}"
+  };
+
+  function setPlaceholder() {
+    const lang = document.getElementById('language').value;
+    document.getElementById('code').placeholder = placeholders[lang] || "Paste your code here...";
+  }
+
+  async function reviewCode() {
+    const code = document.getElementById("code").value;
+    const language = document.getElementById("language").value;
+
+    if (!code) { alert("Please enter your code."); return; }
+    if (!language) { alert("Please select a language."); return; }
+
+    const response = await fetch("/review", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code, language })
+    });
+
+    const data = await response.json();
+    document.getElementById("output").textContent = data.result;
+  }
+</script>
+
+</body>
+</html>
