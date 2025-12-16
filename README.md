@@ -2,8 +2,12 @@
 
 This is a professional AI-based code reviewer created by **Abhinav Devadiga**.
 
-## OUTPUT RECORDINGS
-![Output ](media/OUTPUT.mp4)
+## 🎥 Demo Output
+
+▶️ [Click here to watch the demo video](media/OUTPUT.mp4)
+
+![Output ](media/output1.png)
+
 
 ## Features
 - Reviews Python, JavaScript, HTML code.
