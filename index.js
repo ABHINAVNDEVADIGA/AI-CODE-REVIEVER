@@ -1,19 +1,43 @@
-const express = require('express');
-const path = require('path');
-const reviewEngine = require('./reviewEngine');
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { reviewCode } from "./reviewEngine.js";
+
+dotenv.config();
 
 const app = express();
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
+const PORT = process.env.PORT || 3000;
 
-app.post('/review', async (req, res) => {
+app.use(cors());
+app.use(express.json());
+app.use(express.static("public"));
+
+app.post("/review", async (req, res) => {
+  try {
     const { code, language } = req.body;
-    try {
-        const review = reviewEngine.reviewCode(code, language);
-        res.json({ review });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+
+    if (!code || !language) {
+      return res.status(400).json({
+        success: false,
+        message: "Code or language missing",
+      });
     }
+
+    const review = await reviewCode(code, language);
+
+    res.json({
+      success: true,
+      review,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
