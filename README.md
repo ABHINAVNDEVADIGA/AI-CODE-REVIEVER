@@ -1,13 +1,8 @@
 # AI Code Reviewer
 
+https://ai-code-reviewer1.netlify.app/
+
 This is a professional AI-based code reviewer created by **Abhinav Devadiga**.
-
-## 🎥 Demo Output
-
-▶️ [Click here to watch the demo video](media/OUTPUT.mp4)
-
-![Output ](media/output1.png)
-
 
 ## Features
 - Reviews Python, JavaScript, HTML code.
