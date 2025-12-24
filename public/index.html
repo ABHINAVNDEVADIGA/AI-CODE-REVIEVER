@@ -161,6 +161,11 @@ pre {
 <body>
 
 <div class="topbar">
+  <!-- ✅ ADDED TITLE -->
+  <div style="font-weight:700; font-size:16px; margin-right:20px;">
+    Code Reviewer by Abhinav
+  </div>
+
   <select id="language">
     <option value="">Select Language</option>
     <option>JavaScript</option>
@@ -203,6 +208,12 @@ const reviewBox = document.getElementById("reviewBox");
 const reviewBtn = document.getElementById("reviewBtn");
 let dragging = false;
 
+/* ✅ ADDED: AUTO BACKEND SWITCH (LOCAL / NETLIFY) */
+const API_BASE =
+  location.hostname === "localhost"
+    ? "http://localhost:3000"
+    : "/.netlify/functions";
+
 /* Drag */
 divider.addEventListener("mousedown", () => dragging = true);
 window.addEventListener("mouseup", () => dragging = false);
@@ -232,7 +243,8 @@ async function review() {
   document.querySelectorAll("pre").forEach(p => p.textContent = "Analyzing...");
   reviewBtn.disabled = true;
 
-  const res = await fetch("/review", {
+  /* ✅ FIXED FETCH */
+  const res = await fetch(`${API_BASE}/review`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code, language })
@@ -250,7 +262,7 @@ async function review() {
   reviewBtn.disabled = false;
 }
 
-/* SECTION EXTRACTOR — ONLY FIX */
+/* Section extractor */
 function extractSection(id, text, heading) {
   const regex = new RegExp(
     `${heading}:([\\s\\S]*?)(?=\\n[A-Z][a-z ]+:|$)`,
@@ -264,4 +276,3 @@ function extractSection(id, text, heading) {
 
 </body>
 </html>
-
