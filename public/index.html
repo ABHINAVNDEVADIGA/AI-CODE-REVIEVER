@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Code Reviewer</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #020617;
+  --panel: rgba(15,23,42,0.9);
+  --border: rgba(56,189,248,0.25);
+  --glow: 0 0 30px rgba(56,189,248,0.35);
+  --text: #e5e7eb;
+  --primary: #38bdf8;
+  --secondary: #6366f1;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: Inter, sans-serif;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* Top bar */
+.topbar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--glow);
+}
+
+select {
+  padding: 10px 14px;
+  background: #020617;
+  color: var(--text);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+/* Layout */
+.wrapper {
+  height: calc(100vh - 56px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Editor */
+.editor-box {
+  height: 55%;
+  padding: 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+textarea {
+  flex: 1;
+  background: #020617;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  box-shadow: var(--glow);
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+button {
+  padding: 12px 26px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  color: #020617;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  box-shadow: var(--glow);
+}
+
+/* Divider */
+.divider {
+  height: 24px;
+  position: relative;
+  cursor: row-resize;
+}
+
+.knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(circle at top left, #ffffff, #c7d2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #020617;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+
+.knob::before { content: "⇅"; }
+
+/* Review panel */
+.review-box {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(2,6,23,0.95);
+}
+
+.card {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--glow);
+}
+
+.card h3 { margin: 0 0 10px; }
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
+.bugs h3 { color: #f87171; }
+.improve h3 { color: #facc15; }
+.best h3 { color: #4ade80; }
+.security h3 { color: #c084fc; }
+.performance h3 { color: #38bdf8; }
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <select id="language">
+    <option value="">Select Language</option>
+    <option>JavaScript</option>
+    <option>Python</option>
+    <option>Java</option>
+    <option>C</option>
+    <option>C++</option>
+    <option>HTML</option>
+    <option>CSS</option>
+  </select>
+</div>
+
+<div class="wrapper">
+
+  <div class="editor-box" id="editorBox">
+    <textarea id="code" placeholder="// Paste or write your code here"></textarea>
+    <div class="editor-footer">
+      <button id="reviewBtn" onclick="review()">Review Code</button>
+    </div>
+  </div>
+
+  <div class="divider" id="divider">
+    <div class="knob"></div>
+  </div>
+
+  <div class="review-box" id="reviewBox">
+    <div class="card bugs"><h3>🐞 Bugs & Errors</h3><pre id="bugs"></pre></div>
+    <div class="card improve"><h3>✨ Improvements</h3><pre id="improve"></pre></div>
+    <div class="card best"><h3>📌 Best Practices</h3><pre id="best"></pre></div>
+    <div class="card security"><h3>🔐 Security</h3><pre id="security"></pre></div>
+    <div class="card performance"><h3>⚡ Performance</h3><pre id="performance"></pre></div>
+  </div>
+
+</div>
+
+<script>
+const divider = document.getElementById("divider");
+const editorBox = document.getElementById("editorBox");
+const reviewBox = document.getElementById("reviewBox");
+const reviewBtn = document.getElementById("reviewBtn");
+let dragging = false;
+
+/* Drag */
+divider.addEventListener("mousedown", () => dragging = true);
+window.addEventListener("mouseup", () => dragging = false);
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  const h = e.clientY - 56;
+  if (h < 120) return;
+  editorBox.style.height = h + "px";
+  reviewBox.style.height = `calc(100% - ${h}px - 24px)`;
+});
+
+/* Review */
+async function review() {
+  const code = document.getElementById("code").value;
+  const language = document.getElementById("language").value;
+
+  if (!language) {
+    alert("⚠️ Please select a programming language to review.");
+    return;
+  }
+
+  if (!code.trim()) {
+    alert("⚠️ Please enter some code to review.");
+    return;
+  }
+
+  document.querySelectorAll("pre").forEach(p => p.textContent = "Analyzing...");
+  reviewBtn.disabled = true;
+
+  const res = await fetch("/review", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, language })
+  });
+
+  const data = await res.json();
+  const text = data.review || "";
+
+  extractSection("bugs", text, "Bugs");
+  extractSection("improve", text, "Improvements");
+  extractSection("best", text, "Best Practices");
+  extractSection("security", text, "Security");
+  extractSection("performance", text, "Performance");
+
+  reviewBtn.disabled = false;
+}
+
+/* SECTION EXTRACTOR — ONLY FIX */
+function extractSection(id, text, heading) {
+  const regex = new RegExp(
+    `${heading}:([\\s\\S]*?)(?=\\n[A-Z][a-z ]+:|$)`,
+    "i"
+  );
+  const match = text.match(regex);
+  document.getElementById(id).textContent =
+    match ? match[1].trim() : "None";
+}
+</script>
+
+</body>
+</html>
+
